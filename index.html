@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Finance Tracker</title>
+  <style>
+    :root{
+      --bg:#071427; --card:#0f2130; --accent:#06b6d4; --muted:#9fb0c3; --danger:#ff6b6b;
+      --income-bg:#083344; --expense-bg:#44120e;
+    }
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial;margin:0;padding:0;color:#E6EEF3}
+    body{background:linear-gradient(180deg,#021426 0%, #041728 100%);padding:18px}
+    .app{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
+    h1{font-size:20px}
+    .muted{color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:320px 1fr 360px;gap:14px}
+    .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .small{font-size:12px;color:var(--muted)}
+    input, select, textarea, button{font-family:inherit}
+    input[type="text"], input[type="number"], input[type="date"], select, textarea{
+      width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
+      background:rgba(255,255,255,0.02); color: #E6EEF3;
+    }
+    button{background:var(--accent);border:none;padding:8px 10px;border-radius:8px;color:#012;cursor:pointer;font-weight:700}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .btn-danger{background:var(--danger);color:#fff;border:none}
+
+    .cust-list{max-height:420px;overflow:auto;margin-top:10px}
+    .cust-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:8px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent)}
+    .cust-item .left{display:flex;flex-direction:column}
+    .badge{font-weight:700;padding:6px 8px;border-radius:8px}
+    .balance-pos{background:var(--income-bg);color:#9ff0e7}
+    .balance-neg{background:var(--expense-bg);color:#ffd4d4}
+
+    .ledger{max-height:420px;overflow:auto;margin-top:10px}
+    .txn{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:8px;background:linear-gradient(90deg,rgba(255,255,255,0.01),transparent)}
+    .txn .left{display:flex;flex-direction:column}
+    .txn .meta{font-size:12px;color:var(--muted)}
+
+    .summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .stat{flex:1;min-width:120px;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+    .stat .num{font-weight:800;font-size:16px}
+
+    footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+    @media (max-width:1000px){ .grid{grid-template-columns:1fr; } .card{padding:10px} .summary{flex-direction:column} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>SmartBudget</h1>
+        <div class="muted">Create customers, add credit/debit transactions, view per-customer balance</div>
+      </div>
+      <div class="muted">Offline: data saved in your browser (localStorage)</div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Customers -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+          <div>
+            <div class="small">Customers</div>
+            <strong id="custCount">0</strong>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button id="exportBtn">Export</button>
+            <button id="importBtn" class="btn-ghost">Import</button>
+            <input type="file" id="fileInput" accept="application/json" style="display:none" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <input id="newCustomer" type="text" placeholder="Enter customer name" autocomplete="off" maxlength="50" aria-label="New customer name" title="Type name and press Enter or click Add" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('addCustomer').click();}" />
+          <button id="addCustomer">Add</button>
+        </div>
+
+        <div class="cust-list" id="customers"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:10px 0" />
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <input id="searchCustomer" type="search" placeholder="Search customers (name) — Enter to search, Esc to clear"
+                   autocomplete="off" maxlength="50" aria-label="Search customers" title="Type name and press Enter to search"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('applySearch').click();} else if(event.key==='Escape'){document.getElementById('clearSearch').click();}"
+                   style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit;min-width:160px;flex:1" />
+          </div>
+          <button id="applySearch" class="btn-ghost">Search</button>
+          <button id="clearSearch" class="btn-ghost">Clear</button>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Ledger / Txn -->
+      <div class="card">
+ </svg>       <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="small">Active Customer</div>
+            <strong id="activeName">— select a customer —</strong>
+          </div>
+          <div class="small">Customer Balance: <span id="activeBalance">₹0.00</span></div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <select id="txType">
+            <option value="credit">Credit (Received)</option>
+            <option value="debit">Debit (Paid)</option>
+          </select>
+          <input type="number" id="txAmount" placeholder="Amount (₹)" min="0" step="0.01" />
+          <input type="date" id="txDate" />
+        </div>
+
+        <div style="margin-top:8px">
+          <input type="text" id="txRemark"
+            placeholder="Remark (e.g. Salary, Invoice #, from whom) — optional"
+            maxlength="100" autocomplete="off" aria-label="Transaction remark"
+            title="Who/from where — optional. Press Enter to add transaction"
+            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('addTx').click();}"
+            list="remarkHints" />
+
+          <datalist id="remarkHints">
+            <option value="Monthly Expenses">
+            <option value="Grocery payment">
+            <option value="Fuel">
+            <option value="FastFood">
+            <option value="Other">
+          </datalist>
+        </div>
+
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="addTx">Add Transaction</button>
+          <button id="resetTx" class="btn-ghost">Reset</button>
+          <button id="deleteAllCustTx" class="btn-danger" title="Delete all transactions of active customer">Delete All Tx</button>
+        </div>
+
+        <div style="margin-top:12px" class="summary" id="custSummary">
+          <div class="stat"><div class="small">Total Credit</div><div class="num" id="custCredit">₹0.00</div></div>
+          <div class="stat"><div class="small">Total Debit</div><div class="num" id="custDebit">₹0.00</div></div>
+          <div class="stat"><div class="small">Balance</div><div class="num" id="custBal">₹0.00</div></div>
+        </div>
+
+        <div style="margin-top:12px" class="small">Ledger (recent first)</div>
+        <div class="ledger" id="ledger"></div>
+      </div>
+
+      <!-- RIGHT: Global summary -->
+      <div class="card">
+        <div>
+          <div class="small">Global Summary</div>
+          <div style="margin-top:6px"><strong id="globalCount">0</strong> customers</div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div class="small">Overall income / expense</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)">
+              <div class="small">Income</div>
+              <div class="num" id="globalIncome">₹0.00</div>
+            </div>
+            <div style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)">
+              <div class="small">Expense</div>
+              <div class="num" id="globalExpense">₹0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:10px 0" />
+
+        <div class="small">Quick actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          <button id="exportAll" class="btn-ghost">Export All Data</button>
+          <button id="clearAll" class="btn-danger">Clear All Data</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>Data stored locally (localStorage). Export JSON to backup or move devices.</footer>
+  </div>
+
+<script>
+/* Khatabook Customers & Ledger - Single file app
+   Storage keys:
+     - KEY_CUST: array of customers {id, name}
+     - KEY_TX: array of transactions {id, custId, type:'credit'|'debit', amount, dateISO, remark}
+*/
+
+const KEY_CUST = 'kb_cust_v1'
+const KEY_TX   = 'kb_tx_v1'
+
+/* Utilities */
+const $ = s => document.querySelector(s)
+const uid = () => Math.random().toString(36).slice(2,9)
+const fmt = n => '₹' + Number(n || 0).toFixed(2)
+
+function load(key){ try{ return JSON.parse(localStorage.getItem(key)) || [] }catch(e){ return [] } }
+function save(key, data){ localStorage.setItem(key, JSON.stringify(data)) }
+
+/* App state */
+let customers = load(KEY_CUST)
+let transactions = load(KEY_TX)
+let activeCustomerId = null
+
+/* DOM refs */
+const customersEl = $('#customers'), custCountEl = $('#custCount'), globalCountEl = $('#globalCount')
+const activeNameEl = $('#activeName'), activeBalanceEl = $('#activeBalance'), ledgerEl = $('#ledger')
+const custCreditEl = $('#custCredit'), custDebitEl = $('#custDebit'), custBalEl = $('#custBal')
+const globalIncomeEl = $('#globalIncome'), globalExpenseEl = $('#globalExpense')
+
+/* Init render */
+renderCustomers()
+renderGlobal()
+renderActive(null)
+
+/* Customer management */
+$('#addCustomer').addEventListener('click', ()=>{
+  const name = $('#newCustomer').value.trim()
+  if(!name){ alert('Enter customer name'); return }
+  if(customers.find(c=>c.name.toLowerCase()===name.toLowerCase())){ alert('Customer exists'); return }
+  const c = {id: uid(), name}
+  customers.push(c); save(KEY_CUST, customers)
+  $('#newCustomer').value = ''
+  renderCustomers()
+})
+
+$('#applySearch').addEventListener('click', ()=>{
+  const q = $('#searchCustomer').value.trim().toLowerCase()
+  renderCustomers(q)
+})
+$('#clearSearch').addEventListener('click', ()=>{
+  $('#searchCustomer').value=''; renderCustomers()
+})
+
+function renderCustomers(filter=''){
+  customersEl.innerHTML = ''
+  const list = customers.filter(c => !filter || c.name.toLowerCase().includes(filter.toLowerCase()))
+  custCountEl.textContent = list.length
+  globalCountEl.textContent = customers.length
+  // For each customer show name and quick balance
+  list.forEach(c=>{
+    const bal = customerBalance(c.id)
+    const div = document.createElement('div'); div.className='cust-item'
+    div.innerHTML = `
+      <div class="left">
+        <strong>${c.name}</strong>
+        <div class="small">Transactions: ${transactions.filter(t=>t.custId===c.id).length}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="badge ${bal>=0?'balance-pos':'balance-neg'}">${fmt(bal)}</div>
+        <button data-id="${c.id}" class="btn-ghost viewBtn">View</button>
+        <button data-id="${c.id}" class="btn-ghost renameBtn">Rename</button>
+        <button data-id="${c.id}" class="btn-danger delCustBtn">Delete</button>
+      </div>
+    `
+    customersEl.appendChild(div)
+  })
+  // attach handlers (event delegation could be used; easier to re-query)
+  document.querySelectorAll('.viewBtn').forEach(b=>b.onclick = (e)=>{ selectCustomer(b.dataset.id) })
+  document.querySelectorAll('.delCustBtn').forEach(b=>b.onclick = (e)=>{ 
+    const id = b.dataset.id
+    if(!confirm('Delete customer and ALL their transactions? This cannot be undone.')) return
+    // remove customer and their transactions
+    customers = customers.filter(c=>c.id!==id)
+    transactions = transactions.filter(t=>t.custId!==id)
+    save(KEY_CUST, customers); save(KEY_TX, transactions)
+    if(activeCustomerId === id) activeCustomerId = null
+    renderCustomers(); renderGlobal(); renderActive(null)
+  })
+  document.querySelectorAll('.renameBtn').forEach(b=>b.onclick=(e)=>{
+    const id = b.dataset.id; const c = customers.find(x=>x.id===id)
+    const nm = prompt('Rename customer:', c.name); if(!nm) return
+    c.name = nm.trim(); save(KEY_CUST, customers); renderCustomers(); if(activeCustomerId===id) renderActive(id)
+  })
+}
+
+/* Select customer */
+function selectCustomer(id){
+  activeCustomerId = id
+  renderActive(id)
+}
+
+/* Active customer view */
+function renderActive(id){
+  if(!id){ activeNameEl.textContent = '— select a customer —'; ledgerEl.innerHTML = ''; activeBalanceEl.textContent = fmt(0); custCreditEl.textContent = fmt(0); custDebitEl.textContent = fmt(0); custBalEl.textContent = fmt(0); return }
+  const c = customers.find(x=>x.id===id)
+  if(!c) return
+  activeNameEl.textContent = c.name
+  const custTx = transactions.filter(t=>t.custId===id).slice().sort((a,b)=>b.date.localeCompare(a.date))
+  renderLedger(custTx)
+  const credit = custTx.filter(t=>t.type==='credit').reduce((s,t)=>s+t.amount,0)
+  const debit  = custTx.filter(t=>t.type==='debit').reduce((s,t)=>s+t.amount,0)
+  const bal = credit - debit
+  activeBalanceEl.textContent = fmt(bal)
+  custCreditEl.textContent = fmt(credit)
+  custDebitEl.textContent = fmt(debit)
+  custBalEl.textContent = fmt(bal)
+}
+
+/* Ledger rendering */
+function renderLedger(txns){
+  ledgerEl.innerHTML = ''
+  if(txns.length===0){ ledgerEl.innerHTML = '<div class="small muted">No transactions yet</div>'; return }
+  txns.forEach(t=>{
+    const div = document.createElement('div'); div.className='txn'
+    div.innerHTML = `
+      <div class="left">
+        <div><strong>${t.type==='credit' ? 'Credit' : 'Debit'} • ${fmt(t.amount)}</strong></div>
+        <div class="meta">${t.remark || '-'} • ${new Date(t.date).toLocaleString().replace(',','')}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button data-id="${t.id}" class="btn-ghost editTx">Edit</button>
+        <button data-id="${t.id}" class="btn-danger delTx">Delete</button>
+      </div>
+    `
+    ledgerEl.appendChild(div)
+  })
+  // handlers
+  document.querySelectorAll('.delTx').forEach(b=>b.onclick=(e)=>{
+    const id = b.dataset.id
+    if(!confirm('Delete this transaction?')) return
+    transactions = transactions.filter(x=>x.id!==id)
+    save(KEY_TX, transactions); renderActive(activeCustomerId); renderCustomers(); renderGlobal()
+  })
+  document.querySelectorAll('.editTx').forEach(b=>b.onclick=(e)=>{
+    const id = b.dataset.id; const t = transactions.find(x=>x.id===id)
+    // pre-fill form for editing
+    $('#txType').value = t.type
+    $('#txAmount').value = t.amount
+    $('#txDate').value = t.date.slice(0,10)
+    $('#txRemark').value = t.remark
+    // set editing marker
+    $('#addTx').dataset.edit = id
+    $('#addTx').textContent = 'Save Changes'
+  })
+}
+
+/* Transactions: add/edit */
+$('#addTx').addEventListener('click', ()=>{
+  if(!activeCustomerId){ alert('Select a customer first'); return }
+  const type = $('#txType').value
+  const amount = parseFloat($('#txAmount').value)
+  if(isNaN(amount) || amount<=0){ alert('Enter valid amount'); return }
+  const date = $('#txDate').value ? new Date($('#txDate').value+'T12:00').toISOString() : new Date().toISOString()
+  const remark = $('#txRemark').value.trim()
+  // editing?
+  const editId = $('#addTx').dataset.edit
+  if(editId){
+    const tx = transactions.find(x=>x.id===editId)
+    tx.type = type; tx.amount = amount; tx.date = date; tx.remark = remark
+    delete $('#addTx').dataset.edit
+    $('#addTx').textContent = 'Add Transaction'
+  } else {
+    const tx = { id: uid(), custId: activeCustomerId, type, amount, date, remark }
+    transactions.push(tx)
+  }
+  save(KEY_TX, transactions)
+  // reset form
+  $('#txAmount').value=''; $('#txDate').value=''; $('#txRemark').value=''
+  renderActive(activeCustomerId); renderCustomers(); renderGlobal()
+})
+
+$('#resetTx').addEventListener('click', ()=>{
+  $('#txAmount').value=''; $('#txDate').value=''; $('#txRemark').value=''; delete $('#addTx').dataset.edit; $('#addTx').textContent='Add Transaction'
+})
+
+/* Delete all tx of active customer */
+$('#deleteAllCustTx').addEventListener('click', ()=>{
+  if(!activeCustomerId) return alert('Select a customer first')
+  if(!confirm('Delete ALL transactions of this customer?')) return
+  transactions = transactions.filter(t=>t.custId!==activeCustomerId)
+  save(KEY_TX, transactions); renderActive(activeCustomerId); renderCustomers(); renderGlobal()
+})
+
+/* Helpers */
+function customerBalance(custId){
+  const tx = transactions.filter(t=>t.custId===custId)
+  const credit = tx.filter(t=>t.type==='credit').reduce((s,x)=>s+x.amount,0)
+  const debit  = tx.filter(t=>t.type==='debit').reduce((s,x)=>s+x.amount,0)
+  return credit - debit
+}
+
+/* Global summary render */
+function renderGlobal(){
+  const income = transactions.filter(t=>t.type==='credit').reduce((s,t)=>s+t.amount,0)
+  const expense = transactions.filter(t=>t.type==='debit').reduce((s,t)=>s+t.amount,0)
+  globalIncomeEl.textContent = fmt(income)
+  globalExpenseEl.textContent = fmt(expense)
+  globalCountEl.textContent = customers.length
+}
+
+/* Export & Import */
+$('#exportBtn').addEventListener('click', ()=>{
+  const data = { customers, transactions }
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'})
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a'); a.href=url; a.download='khatabook_customers_export.json'; a.click(); URL.revokeObjectURL(url)
+})
+$('#exportAll').addEventListener('click', ()=>$('#exportBtn').click())
+
+$('#importBtn').addEventListener('click', ()=>$('#fileInput').click())
+$('#fileInput').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return
+  const rdr = new FileReader(); rdr.onload = ev=>{
+    try{
+      const imp = JSON.parse(ev.target.result)
+      if(!imp.customers || !imp.transactions) return alert('Invalid file format')
+      if(!confirm('Import will replace local data. Continue?')) return
+      customers = imp.customers; transactions = imp.transactions
+      save(KEY_CUST, customers); save(KEY_TX, transactions)
+      activeCustomerId = null; renderCustomers(); renderGlobal(); renderActive(null); alert('Imported OK')
+    }catch(err){ alert('Invalid JSON') }
+  }; rdr.readAsText(f)
+})
+
+/* Clear All */
+$('#clearAll').addEventListener('click', ()=>{
+  if(!confirm('Clear ALL data (customers + transactions)?')) return
+  customers = []; transactions = []; activeCustomerId = null
+  save(KEY_CUST, customers); save(KEY_TX, transactions); renderCustomers(); renderGlobal(); renderActive(null)
+})
+
+/* Initial sample - optional: uncomment to seed sample data
+if(customers.length===0){
+  customers.push({id:uid(), name:'Ramesh'}); customers.push({id:uid(), name:'Shop A'}); save(KEY_CUST, customers)
+}
+*/
+
+</script>
+</body>
+</html>
