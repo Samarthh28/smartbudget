@@ -4,6 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Finance Tracker</title>
+  
+<!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#06b6d4">
+
   <style>
     :root{
       --bg:#071427; --card:#0f2130; --accent:#06b6d4; --muted:#9fb0c3; --danger:#ff6b6b;
@@ -186,6 +191,11 @@
      - KEY_CUST: array of customers {id, name}
      - KEY_TX: array of transactions {id, custId, type:'credit'|'debit', amount, dateISO, remark}
 */
+ /* --- Service Worker registration --- */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW registered')).catch(err=>console.log('SW failed:',err));
+}
+/* --- App Code --- */
 
 const KEY_CUST = 'kb_cust_v1'
 const KEY_TX   = 'kb_tx_v1'
