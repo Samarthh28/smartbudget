@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SmartBudget AI</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#6d28d9">
+  <meta name="theme-color" content="#a855f7">
+
   <meta name="description"
     content="SmartBudget AI — single-file demo. Offline, local insights, forecast, user categories.">
 
@@ -657,6 +658,9 @@
        - SB_TX: [{id,acctId,type,amount,category,remark,date}]
        - SB_CATS: [ "Food", "Travel", ... ]
     */
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js');
+  }
 
     const KEY_ACCTS = 'SB_ACCOUNTS_v1'
     const KEY_TX = 'SB_TX_v1'
