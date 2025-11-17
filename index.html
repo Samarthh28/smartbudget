@@ -1,115 +1,497 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SmartBudget AI — Demo (Dark Purple)</title>
+  <title>SmartBudget AI</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6d28d9">
-  <meta name="description" content="SmartBudget AI — single-file demo. Offline, local insights, forecast, user categories.">
+  <meta name="description"
+    content="SmartBudget AI — single-file demo. Offline, local insights, forecast, user categories.">
 
   <style>
-    :root{
-      --bg:#08050b;
-      --panel:#0d0612;
-      --card:#0f0716;
-      --muted:#9aa0b2;
-      --text:#f7f7fb;
-      --accent:#7c3aed;    /* purple */
-      --accent-2:#a78bfa;
-      --accent-3:#6d28d9;
+    :root {
+      --bg: #08050b;
+      --panel: #0d0612;
+      --card: #0f0716;
+      --muted: #9aa0b2;
+      --text: #f7f7fb;
+      --accent: #7c3aed;
+      /* purple */
+      --accent-2: #a78bfa;
+      --accent-3: #6d28d9;
       --positive: #10b981;
       --negative: #ef4444;
-      --glass: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.04);
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.04);
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
 
-    html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#05030a 0%, var(--bg) 100%);color:var(--text);-webkit-font-smoothing:antialiased}
-    .app{max-width:760px;margin:0 auto;padding:12px 12px 94px 12px;min-height:100vh;box-sizing:border-box}
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #05030a 0%, var(--bg) 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased
+    }
 
-    header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#0b0320}
-    h1{font-size:18px;margin:0}
-    .subtitle{font-size:13px;color:var(--muted)}
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 12px 12px 94px 12px;
+      min-height: 100vh;
+      box-sizing: border-box
+    }
 
-    .grid{display:grid;grid-template-columns:1fr;gap:12px}
-    @media(min-width:900px){.grid{grid-template-columns:320px 1fr}}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px
+    }
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:12px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(99,102,241,0.06)}
-    .small{font-size:13px;color:var(--muted)}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #0b0320
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px
+    }
+
+    @media(min-width:900px) {
+      .grid {
+        grid-template-columns: 320px 1fr
+      }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.06)
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted)
+    }
 
     /* left panel: accounts/categories */
-    .left-col .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .account-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto;padding-right:4px}
-    .account-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:var(--glass);border:1px solid var(--border)}
-    .acct-left{display:flex;gap:10px;align-items:center}
-    .avatar{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text)}
-    .acct-name{font-weight:700}
-    .acct-meta{font-size:12px;color:var(--muted)}
+    .left-col .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px
+    }
 
-    .badge{padding:6px 10px;border-radius:10px;font-weight:700;font-size:13px}
-    .bal-pos{background:rgba(16,185,129,0.08);color:var(--positive)}
-    .bal-neg{background:rgba(239,68,68,0.08);color:var(--negative)}
+    .account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 420px;
+      overflow: auto;
+      padding-right: 4px
+    }
+
+    .account-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--glass);
+      border: 1px solid var(--border)
+    }
+
+    .acct-left {
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .acct-name {
+      font-weight: 700
+    }
+
+    .acct-meta {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px
+    }
+
+    .bal-pos {
+      background: rgba(16, 185, 129, 0.08);
+      color: var(--positive)
+    }
+
+    .bal-neg {
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--negative)
+    }
 
     /* main area */
-    .top-cards{display:flex;gap:10px;flex-wrap:wrap}
-    .stat{flex:1;min-width:130px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid var(--border)}
-    .stat .num{font-weight:800;font-size:18px;margin-top:6px}
+    .top-cards {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .stat {
+      flex: 1;
+      min-width: 130px;
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+      border: 1px solid var(--border)
+    }
+
+    .stat .num {
+      font-weight: 800;
+      font-size: 18px;
+      margin-top: 6px
+    }
 
     /* simple (text) charts */
-    .bars{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .bar-row{display:flex;align-items:center;gap:10px}
-    .bar-label{width:110px;font-size:13px;color:var(--muted)}
-    .bar-track{flex:1;height:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:8px;overflow:hidden;border:1px solid var(--border)}
-    .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:8px;transition:width .5s}
+    .bars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px
+    }
 
-    .tx-list{margin-top:10px;max-height:320px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
-    .tx{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:var(--glass);border:1px solid var(--border)}
-    .tx .meta{font-size:12px;color:var(--muted);margin-top:6px}
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .bar-label {
+      width: 110px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 12px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border)
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 8px;
+      transition: width .5s
+    }
+
+    .tx-list {
+      margin-top: 10px;
+      max-height: 320px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 6px
+    }
+
+    .tx {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--glass);
+      border: 1px solid var(--border)
+    }
+
+    .tx .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px
+    }
 
     /* insights */
-    .insight{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(124,58,237,0.06), rgba(124,58,237,0.03));border:1px solid rgba(124,58,237,0.12)}
-    .tips{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .tip{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);font-size:14px}
+    .insight {
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(124, 58, 237, 0.06), rgba(124, 58, 237, 0.03));
+      border: 1px solid rgba(124, 58, 237, 0.12)
+    }
+
+    .tips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .tip {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      font-size: 14px
+    }
 
     /* forms & sheet */
-    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:14px}
-    .row{display:flex;gap:8px}
-    .row > *{flex:1}
-    .btn{padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
-    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#0b0320}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-danger{background:var(--negative);color:#fff}
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 14px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px
+    }
+
+    .row>* {
+      flex: 1
+    }
+
+    .btn {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #0b0320
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted)
+    }
+
+    .btn-danger {
+      background: var(--negative);
+      color: #fff
+    }
 
     /* FAB */
-    .fab{position:fixed;right:18px;bottom:86px;width:64px;height:64px;border-radius:16px;background:linear-gradient(90deg,var(--accent-3),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 12px 30px rgba(109,40,217,0.12);z-index:60}
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: 86px;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(109, 40, 217, 0.12);
+      z-index: 60
+    }
 
     /* bottom nav (dark) */
-    .bottom-nav{position:fixed;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,#07030b,#0b0713);display:flex;align-items:center;justify-content:space-around;border-top:1px solid rgba(255,255,255,0.02);z-index:80}
-    .nav-btn{display:flex;flex-direction:column;align-items:center;color:var(--muted);font-size:12px;text-decoration:none}
-    .nav-btn.active{color:var(--accent-2)}
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 64px;
+      background: linear-gradient(180deg, #07030b, #0b0713);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      border-top: 1px solid rgba(255, 255, 255, 0.02);
+      z-index: 80
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none
+    }
+
+    .nav-btn.active {
+      color: var(--accent-2)
+    }
 
     /* sheet (quick add/general) */
-    .sheet{position:fixed;left:12px;right:12px;bottom:84px;background:linear-gradient(180deg,#0b0613,#0f0716);border-radius:14px;padding:12px;border:1px solid var(--border);box-shadow:0 12px 40px rgba(2,6,23,0.8);transform:translateY(110%);transition:transform .28s cubic-bezier(.2,.9,.3,1);z-index:90}
-    .sheet.open{transform:translateY(0)}
-    .handle{width:48px;height:4px;background:rgba(255,255,255,0.04);border-radius:4px;margin:6px auto}
+    .sheet {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 84px;
+      background: linear-gradient(180deg, #0b0613, #0f0716);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(2, 6, 23, 0.8);
+      transform: translateY(110%);
+      transition: transform .28s cubic-bezier(.2, .9, .3, 1);
+      z-index: 90
+    }
 
-    footer{color:var(--muted);font-size:13px;text-align:center;margin-top:14px}
+    .sheet.open {
+      transform: translateY(0)
+    }
+
+    .handle {
+      width: 48px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 4px;
+      margin: 6px auto
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 14px
+    }
 
     /* small responsive tweaks */
-    @media(max-width:420px){
-      .brand h1{font-size:16px}
-      .bar-label{width:90px}
-      .app{padding-bottom:120px}
+    @media(max-width:420px) {
+      .brand h1 {
+        font-size: 16px
+      }
+
+      .bar-label {
+        width: 90px
+      }
+
+      .app {
+        padding-bottom: 120px
+      }
+    }
+
+    .app {
+      max-width: 100%;
+      padding: 10px 10px 90px 10px;
+    }
+
+    .card {
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media(min-width:780px) {
+      .grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+      }
+    }
+
+    .account-list,
+    .tx-list {
+      max-height: 390px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .bottom-nav {
+      padding-bottom: env(safe-area-inset-bottom);
+      height: 70px;
+    }
+
+    .fab {
+      width: 58px;
+      height: 58px;
+      bottom: 100px;
+      right: 16px;
+    }
+
+    .sheet {
+      bottom: 80px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    input,
+    select {
+      padding: 12px;
+      font-size: 15px;
     }
   </style>
 </head>
+
 <body>
   <div class="app" id="app">
     <header>
-      <div class="brand"><div class="logo">SB</div><div><h1>SmartBudget AI</h1><div class="subtitle">Privacy-first finance insights</div></div></div>
+      <div class="brand">
+        <div class="logo">SB</div>
+        <div>
+          <h1>SmartBudget AI</h1>
+          <div class="subtitle">Privacy-first finance insights</div>
+        </div>
+      </div>
       <div style="text-align:right">
         <div class="small">Local data • PWA ready</div>
         <div style="margin-top:8px"><button id="openAccountSheet" class="btn btn-ghost">+ Account</button></div>
@@ -119,7 +501,12 @@
     <div class="grid">
       <!-- LEFT: accounts & categories -->
       <div class="card left-col">
-        <div class="section-title"><div><div class="small">Accounts</div><strong id="acctCount">0</strong></div><div class="small">Manage</div></div>
+        <div class="section-title">
+          <div>
+            <div class="small">Accounts</div><strong id="acctCount">0</strong>
+          </div>
+          <div class="small">Manage</div>
+        </div>
 
         <div class="account-list" id="accounts"></div>
 
@@ -144,14 +531,29 @@
       <div>
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div class="small">Balance</div><div class="num" id="totalBalance" style="font-size:20px;font-weight:800">₹0.00</div></div>
-            <div style="text-align:right"><div class="small">This month</div><div id="monthSummary" class="small">Income ₹0 • Expense ₹0</div></div>
+            <div>
+              <div class="small">Balance</div>
+              <div class="num" id="totalBalance" style="font-size:20px;font-weight:800">₹0.00</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small">This month</div>
+              <div id="monthSummary" class="small">Income ₹0 • Expense ₹0</div>
+            </div>
           </div>
 
           <div class="top-cards" style="margin-top:10px">
-            <div class="stat"><div class="small">Income</div><div class="num" id="totalIncome">₹0.00</div></div>
-            <div class="stat"><div class="small">Expense</div><div class="num" id="totalExpense">₹0.00</div></div>
-            <div class="stat"><div class="small">Forecast (next month)</div><div class="num" id="forecastVal">₹0.00</div></div>
+            <div class="stat">
+              <div class="small">Income</div>
+              <div class="num" id="totalIncome">₹0.00</div>
+            </div>
+            <div class="stat">
+              <div class="small">Expense</div>
+              <div class="num" id="totalExpense">₹0.00</div>
+            </div>
+            <div class="stat">
+              <div class="small">Forecast (next month)</div>
+              <div class="num" id="forecastVal">₹0.00</div>
+            </div>
           </div>
 
           <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
@@ -169,14 +571,17 @@
 
         <div class="card" style="margin-top:12px">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div class="small">AI Insights</div><strong>Smart Tips</strong></div>
+            <div>
+              <div class="small">AI Insights</div><strong>Smart Tips</strong>
+            </div>
             <div class="small">Auto suggestions</div>
           </div>
 
           <div style="margin-top:10px" id="insightsArea">
             <div class="insight" id="insightMain">
               <div class="small">Summary</div>
-              <div id="insightSummary" style="margin-top:8px;font-weight:700">No data yet — add transactions to see insights.</div>
+              <div id="insightSummary" style="margin-top:8px;font-weight:700">No data yet — add transactions to see
+                insights.</div>
               <div class="tips" id="insightTips"></div>
             </div>
           </div>
@@ -220,7 +625,10 @@
       <input id="sheetRemark" placeholder="Remark (optional)" />
       <div style="height:12px"></div>
       <div style="display:flex;gap:8px">
-        <select id="sheetType"><option value="debit">Expense (Paid)</option><option value="credit">Income (Received)</option></select>
+        <select id="sheetType">
+          <option value="debit">Expense (Paid)</option>
+          <option value="credit">Income (Received)</option>
+        </select>
         <button id="saveQuick" class="btn btn-primary">Save</button>
         <button id="closeQuick" class="btn btn-ghost">Close</button>
       </div>
@@ -242,404 +650,406 @@
     </div>
   </div>
 
-<script>
-/* SmartBudget AI — single-file app
-   LocalStorage keys:
-   - SB_ACCOUNTS: [{id,name,balance}]
-   - SB_TX: [{id,acctId,type,amount,category,remark,date}]
-   - SB_CATS: [ "Food", "Travel", ... ]
-*/
+  <script>
+    /* SmartBudget AI — single-file app
+       LocalStorage keys:
+       - SB_ACCOUNTS: [{id,name,balance}]
+       - SB_TX: [{id,acctId,type,amount,category,remark,date}]
+       - SB_CATS: [ "Food", "Travel", ... ]
+    */
 
-const KEY_ACCTS = 'SB_ACCOUNTS_v1'
-const KEY_TX = 'SB_TX_v1'
-const KEY_CATS = 'SB_CATS_v1'
+    const KEY_ACCTS = 'SB_ACCOUNTS_v1'
+    const KEY_TX = 'SB_TX_v1'
+    const KEY_CATS = 'SB_CATS_v1'
 
-const $ = s => document.querySelector(s)
-const uid = () => Math.random().toString(36).slice(2,10)
-const fmt = n => '₹' + Number(n || 0).toFixed(2)
-const todayMonthKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`
+    const $ = s => document.querySelector(s)
+    const uid = () => Math.random().toString(36).slice(2, 10)
+    const fmt = n => '₹' + Number(n || 0).toFixed(2)
+    const todayMonthKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 
-function load(k){ try { return JSON.parse(localStorage.getItem(k)) || [] } catch(e){ return [] } }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+    function load(k) { try { return JSON.parse(localStorage.getItem(k)) || [] } catch (e) { return [] } }
+    function save(k, v) { localStorage.setItem(k, JSON.stringify(v)) }
 
-// App state
-let accounts = load(KEY_ACCTS)
-let tx = load(KEY_TX)
-let categories = load(KEY_CATS)
-if(!categories || categories.length===0) {
-  categories = ['Food','Travel','Shopping','Bills','Others']
-  save(KEY_CATS, categories)
-}
+    // App state
+    let accounts = load(KEY_ACCTS)
+    let tx = load(KEY_TX)
+    let categories = load(KEY_CATS)
+    if (!categories || categories.length === 0) {
+      categories = ['Food', 'Travel', 'Shopping', 'Bills', 'Others']
+      save(KEY_CATS, categories)
+    }
 
-// DOM refs
-const accountsEl = $('#accounts'), acctCount = $('#acctCount')
-const totalBalanceEl = $('#totalBalance'), totalIncomeEl = $('#totalIncome'), totalExpenseEl = $('#totalExpense'), forecastEl = $('#forecastVal'), monthSummary = $('#monthSummary')
-const barsEl = $('#bars'), txListEl = $('#txList'), insightSummary = $('#insightSummary'), insightTips = $('#insightTips'), insightMain = $('#insightMain')
-const sheetQuick = $('#sheetQuickAdd'), fab = $('#fab')
+    // DOM refs
+    const accountsEl = $('#accounts'), acctCount = $('#acctCount')
+    const totalBalanceEl = $('#totalBalance'), totalIncomeEl = $('#totalIncome'), totalExpenseEl = $('#totalExpense'), forecastEl = $('#forecastVal'), monthSummary = $('#monthSummary')
+    const barsEl = $('#bars'), txListEl = $('#txList'), insightSummary = $('#insightSummary'), insightTips = $('#insightTips'), insightMain = $('#insightMain')
+    const sheetQuick = $('#sheetQuickAdd'), fab = $('#fab')
 
-// init
-renderAccounts()
-renderDashboard()
-renderCategories()
-renderTxList()
-renderAccountSelects()
-updateTotals()
+    // init
+    renderAccounts()
+    renderDashboard()
+    renderCategories()
+    renderTxList()
+    renderAccountSelects()
+    updateTotals()
 
-/* ---------- Accounts ---------- */
-$('#addAccount')?.addEventListener('click', ()=>{
-  const name = $('#acctName').value.trim()
-  if(!name) return alert('Enter account name')
-  accounts.push({id: uid(), name, balance: 0})
-  save(KEY_ACCTS, accounts)
-  $('#acctName').value=''
-  renderAccounts(); renderAccountSelects(); updateTotals()
-})
+    /* ---------- Accounts ---------- */
+    $('#addAccount')?.addEventListener('click', () => {
+      const name = $('#acctName').value.trim()
+      if (!name) return alert('Enter account name')
+      accounts.push({ id: uid(), name, balance: 0 })
+      save(KEY_ACCTS, accounts)
+      $('#acctName').value = ''
+      renderAccounts(); renderAccountSelects(); updateTotals()
+    })
 
-function renderAccounts(){
-  accountsEl.innerHTML = ''
-  acctCount.textContent = accounts.length
-  if(accounts.length===0){
-    accountsEl.innerHTML = `<div class="small" style="color:var(--muted)">No accounts yet. Add one to start.</div>`
-    return
-  }
-  accounts.forEach(a=>{
-    const div = document.createElement('div'); div.className='account-item'
-    div.innerHTML = `
+    function renderAccounts() {
+      accountsEl.innerHTML = ''
+      acctCount.textContent = accounts.length
+      if (accounts.length === 0) {
+        accountsEl.innerHTML = `<div class="small" style="color:var(--muted)">No accounts yet. Add one to start.</div>`
+        return
+      }
+      accounts.forEach(a => {
+        const div = document.createElement('div'); div.className = 'account-item'
+        div.innerHTML = `
       <div class="acct-left">
-        <div class="avatar">${escapeHtml(a.name.slice(0,2).toUpperCase())}</div>
+        <div class="avatar">${escapeHtml(a.name.slice(0, 2).toUpperCase())}</div>
         <div>
           <div class="acct-name">${escapeHtml(a.name)}</div>
           <div class="acct-meta">${transactionsForAccount(a.id).length} tx</div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-        <div class="badge ${accountBalance(a.id)>=0 ? 'bal-pos' : 'bal-neg'}">${fmt(accountBalance(a.id))}</div>
+        <div class="badge ${accountBalance(a.id) >= 0 ? 'bal-pos' : 'bal-neg'}">${fmt(accountBalance(a.id))}</div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-ghost viewAcct" data-id="${a.id}">View</button>
           <button class="btn btn-ghost renameAcct" data-id="${a.id}">Rename</button>
           <button class="btn btn-danger delAcct" data-id="${a.id}">Delete</button>
         </div>
       </div>`
-    accountsEl.appendChild(div)
-  })
-  document.querySelectorAll('.viewAcct').forEach(b=>b.onclick=()=>{ selectAccount(b.dataset.id) })
-  document.querySelectorAll('.renameAcct').forEach(b=>b.onclick=()=>{
-    const id=b.dataset.id; const acc = accounts.find(x=>x.id===id); const nm = prompt('Rename account', acc.name); if(!nm) return; acc.name = nm.trim(); save(KEY_ACCTS, accounts); renderAccounts(); renderAccountSelects()
-  })
-  document.querySelectorAll('.delAcct').forEach(b=>b.onclick=()=>{
-    const id=b.dataset.id; if(!confirm('Delete account and ALL its transactions?')) return; accounts = accounts.filter(x=>x.id!==id); tx = tx.filter(t=>t.acctId!==id); save(KEY_ACCTS, accounts); save(KEY_TX, tx); renderAccounts(); renderTxList(); renderDashboard()
-  })
-}
+        accountsEl.appendChild(div)
+      })
+      document.querySelectorAll('.viewAcct').forEach(b => b.onclick = () => { selectAccount(b.dataset.id) })
+      document.querySelectorAll('.renameAcct').forEach(b => b.onclick = () => {
+        const id = b.dataset.id; const acc = accounts.find(x => x.id === id); const nm = prompt('Rename account', acc.name); if (!nm) return; acc.name = nm.trim(); save(KEY_ACCTS, accounts); renderAccounts(); renderAccountSelects()
+      })
+      document.querySelectorAll('.delAcct').forEach(b => b.onclick = () => {
+        const id = b.dataset.id; if (!confirm('Delete account and ALL its transactions?')) return; accounts = accounts.filter(x => x.id !== id); tx = tx.filter(t => t.acctId !== id); save(KEY_ACCTS, accounts); save(KEY_TX, tx); renderAccounts(); renderTxList(); renderDashboard()
+      })
+    }
 
-/* ---------- Categories ---------- */
-$('#addCategory')?.addEventListener('click', ()=>{
-  const v = $('#newCategory').value.trim()
-  if(!v) return
-  if(categories.includes(v)) return alert('Category exists')
-  categories.push(v); save(KEY_CATS, categories); $('#newCategory').value=''; renderCategories(); renderAccountSelects()
-})
+    /* ---------- Categories ---------- */
+    $('#addCategory')?.addEventListener('click', () => {
+      const v = $('#newCategory').value.trim()
+      if (!v) return
+      if (categories.includes(v)) return alert('Category exists')
+      categories.push(v); save(KEY_CATS, categories); $('#newCategory').value = ''; renderCategories(); renderAccountSelects()
+    })
 
-function renderCategories(){
-  const el = $('#categoryList'); el.innerHTML = ''
-  categories.forEach(c=>{
-    const btn = document.createElement('button'); btn.className='btn btn-ghost'; btn.textContent = c
-    btn.onclick = ()=>{ if(!confirm(`Delete category "${c}"? This won't delete transactions.`)) return; categories = categories.filter(x=>x!==c); save(KEY_CATS,categories); renderCategories(); renderAccountSelects() }
-    el.appendChild(btn)
-  })
-}
+    function renderCategories() {
+      const el = $('#categoryList'); el.innerHTML = ''
+      categories.forEach(c => {
+        const btn = document.createElement('button'); btn.className = 'btn btn-ghost'; btn.textContent = c
+        btn.onclick = () => { if (!confirm(`Delete category "${c}"? This won't delete transactions.`)) return; categories = categories.filter(x => x !== c); save(KEY_CATS, categories); renderCategories(); renderAccountSelects() }
+        el.appendChild(btn)
+      })
+    }
 
-/* ---------- Transactions ---------- */
-fab.onclick = ()=>{ openSheet('sheetQuickAdd'); populateSheetSelects() }
-$('#closeQuick')?.addEventListener('click', ()=>closeSheet('sheetQuickAdd'))
+    /* ---------- Transactions ---------- */
+    fab.onclick = () => { openSheet('sheetQuickAdd'); populateSheetSelects() }
+    $('#closeQuick')?.addEventListener('click', () => closeSheet('sheetQuickAdd'))
 
-$('#saveQuick')?.addEventListener('click', ()=>{
-  const acct = $('#sheetAccount').value; const cat = $('#sheetCategory').value; const amount = parseFloat($('#sheetAmount').value); const remark = $('#sheetRemark').value.trim(); const type = $('#sheetType').value
-  if(!acct) return alert('Select account'); if(isNaN(amount) || amount<=0) return alert('Enter amount')
-  const item = { id: uid(), acctId: acct, type, amount, category: cat, remark, date: new Date().toISOString() }
-  tx.push(item); save(KEY_TX, tx); closeSheet('sheetQuickAdd'); $('#sheetAmount').value=''; $('#sheetRemark').value=''
-  renderTxList(); renderDashboard(); renderAccounts(); updateTotals()
-})
+    $('#saveQuick')?.addEventListener('click', () => {
+      const acct = $('#sheetAccount').value; const cat = $('#sheetCategory').value; const amount = parseFloat($('#sheetAmount').value); const remark = $('#sheetRemark').value.trim(); const type = $('#sheetType').value
+      if (!acct) return alert('Select account'); if (isNaN(amount) || amount <= 0) return alert('Enter amount')
+      const item = { id: uid(), acctId: acct, type, amount, category: cat, remark, date: new Date().toISOString() }
+      tx.push(item); save(KEY_TX, tx); closeSheet('sheetQuickAdd'); $('#sheetAmount').value = ''; $('#sheetRemark').value = ''
+      renderTxList(); renderDashboard(); renderAccounts(); updateTotals()
+    })
 
-function transactionsForAccount(acctId){ return tx.filter(t=>t.acctId===acctId) }
-function accountBalance(acctId){
-  const t = transactionsForAccount(acctId)
-  const credit = t.filter(x=>x.type==='credit').reduce((s,x)=>s + Number(x.amount),0)
-  const debit  = t.filter(x=>x.type==='debit').reduce((s,x)=>s + Number(x.amount),0)
-  return credit - debit
-}
+    function transactionsForAccount(acctId) { return tx.filter(t => t.acctId === acctId) }
+    function accountBalance(acctId) {
+      const t = transactionsForAccount(acctId)
+      const credit = t.filter(x => x.type === 'credit').reduce((s, x) => s + Number(x.amount), 0)
+      const debit = t.filter(x => x.type === 'debit').reduce((s, x) => s + Number(x.amount), 0)
+      return credit - debit
+    }
 
-/* main tx list */
-function renderTxList(){
-  txListEl.innerHTML = ''
-  if(tx.length===0){ txListEl.innerHTML = `<div class="small" style="color:var(--muted)">No transactions yet</div>`; return }
-  const list = tx.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,50)
-  list.forEach(t=>{
-    const div = document.createElement('div'); div.className='tx'
-    const a = accounts.find(x=>x.id===t.acctId)
-    div.innerHTML = `<div><div style="font-weight:700">${t.type==='credit' ? 'Income' : 'Expense'} • ${fmt(t.amount)}</div><div class="meta">${escapeHtml(t.category)} • ${a?escapeHtml(a.name):'—'} • ${new Date(t.date).toLocaleString()}</div></div>
+    /* main tx list */
+    function renderTxList() {
+      txListEl.innerHTML = ''
+      if (tx.length === 0) { txListEl.innerHTML = `<div class="small" style="color:var(--muted)">No transactions yet</div>`; return }
+      const list = tx.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 50)
+      list.forEach(t => {
+        const div = document.createElement('div'); div.className = 'tx'
+        const a = accounts.find(x => x.id === t.acctId)
+        div.innerHTML = `<div><div style="font-weight:700">${t.type === 'credit' ? 'Income' : 'Expense'} • ${fmt(t.amount)}</div><div class="meta">${escapeHtml(t.category)} • ${a ? escapeHtml(a.name) : '—'} • ${new Date(t.date).toLocaleString()}</div></div>
     <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-      <div style="font-weight:700;color:${t.type==='credit'?'var(--positive)':'var(--negative)'}">${t.type==='credit'?'+':'-'}${fmt(t.amount)}</div>
+      <div style="font-weight:700;color:${t.type === 'credit' ? 'var(--positive)' : 'var(--negative)'}">${t.type === 'credit' ? '+' : '-'}${fmt(t.amount)}</div>
       <div style="display:flex;gap:6px"><button class="btn btn-ghost editTx" data-id="${t.id}">Edit</button><button class="btn btn-danger delTx" data-id="${t.id}">Delete</button></div>
     </div>`
-    txListEl.appendChild(div)
-  })
-  document.querySelectorAll('.delTx').forEach(b=>b.onclick=()=>{ const id=b.dataset.id; if(!confirm('Delete this transaction?')) return; tx = tx.filter(x=>x.id!==id); save(KEY_TX,tx); renderTxList(); renderDashboard(); updateTotals() })
-  document.querySelectorAll('.editTx').forEach(b=>b.onclick=()=>{ const id=b.dataset.id; const tItem = tx.find(x=>x.id===id); openSheet('sheetQuickAdd'); populateSheetSelects(); $('#sheetAccount').value = tItem.acctId; $('#sheetCategory').value=tItem.category; $('#sheetAmount').value=tItem.amount; $('#sheetRemark').value=tItem.remark; $('#sheetType').value=tItem.type; // modify save to overwrite
-    $('#saveQuick').onclick = ()=>{ const acct = $('#sheetAccount').value; const cat = $('#sheetCategory').value; const amount = parseFloat($('#sheetAmount').value); const remark = $('#sheetRemark').value.trim(); const type = $('#sheetType').value; if(isNaN(amount) || amount<=0) return alert('Enter amount'); tItem.acctId = acct; tItem.category = cat; tItem.amount = amount; tItem.remark = remark; tItem.type = type; tItem.date = new Date().toISOString(); save(KEY_TX,tx); closeSheet('sheetQuickAdd'); $('#saveQuick').onclick = saveQuickDefault; renderTxList(); renderDashboard(); updateTotals() }
-  })
-}
+        txListEl.appendChild(div)
+      })
+      document.querySelectorAll('.delTx').forEach(b => b.onclick = () => { const id = b.dataset.id; if (!confirm('Delete this transaction?')) return; tx = tx.filter(x => x.id !== id); save(KEY_TX, tx); renderTxList(); renderDashboard(); updateTotals() })
+      document.querySelectorAll('.editTx').forEach(b => b.onclick = () => {
+        const id = b.dataset.id; const tItem = tx.find(x => x.id === id); openSheet('sheetQuickAdd'); populateSheetSelects(); $('#sheetAccount').value = tItem.acctId; $('#sheetCategory').value = tItem.category; $('#sheetAmount').value = tItem.amount; $('#sheetRemark').value = tItem.remark; $('#sheetType').value = tItem.type; // modify save to overwrite
+        $('#saveQuick').onclick = () => { const acct = $('#sheetAccount').value; const cat = $('#sheetCategory').value; const amount = parseFloat($('#sheetAmount').value); const remark = $('#sheetRemark').value.trim(); const type = $('#sheetType').value; if (isNaN(amount) || amount <= 0) return alert('Enter amount'); tItem.acctId = acct; tItem.category = cat; tItem.amount = amount; tItem.remark = remark; tItem.type = type; tItem.date = new Date().toISOString(); save(KEY_TX, tx); closeSheet('sheetQuickAdd'); $('#saveQuick').onclick = saveQuickDefault; renderTxList(); renderDashboard(); updateTotals() }
+      })
+    }
 
-function saveQuickDefault(){ /* placeholder to restore later */ }
-saveQuickDefault = $('#saveQuick').onclick
+    function saveQuickDefault() { /* placeholder to restore later */ }
+    saveQuickDefault = $('#saveQuick').onclick
 
-/* ---------- Dashboard (bars, totals, forecast, insights) ---------- */
-function renderDashboard(){
-  // spending by category (this month)
-  const now = new Date()
-  const monthKey = todayMonthKey(now)
-  const catTotals = {}
-  categories.forEach(c=>catTotals[c]=0)
-  tx.forEach(t=>{
-    const tMon = todayMonthKey(new Date(t.date))
-    if(tMon !== monthKey) return
-    if(!catTotals[t.category]) catTotals[t.category]=0
-    if(t.type==='debit') catTotals[t.category]+=Number(t.amount)
-    else catTotals[t.category]-=0 // we only chart expenses
-  })
-  // compute max for bar scaling
-  const max = Math.max(1, ...Object.values(catTotals))
-  barsEl.innerHTML = ''
-  Object.keys(catTotals).forEach(cat=>{
-    const val = catTotals[cat] || 0
-    const pct = Math.round((val / max) * 100)
-    const row = document.createElement('div'); row.className='bar-row'
-    row.innerHTML = `<div class="bar-label">${escapeHtml(cat)}</div>
+    /* ---------- Dashboard (bars, totals, forecast, insights) ---------- */
+    function renderDashboard() {
+      // spending by category (this month)
+      const now = new Date()
+      const monthKey = todayMonthKey(now)
+      const catTotals = {}
+      categories.forEach(c => catTotals[c] = 0)
+      tx.forEach(t => {
+        const tMon = todayMonthKey(new Date(t.date))
+        if (tMon !== monthKey) return
+        if (!catTotals[t.category]) catTotals[t.category] = 0
+        if (t.type === 'debit') catTotals[t.category] += Number(t.amount)
+        else catTotals[t.category] -= 0 // we only chart expenses
+      })
+      // compute max for bar scaling
+      const max = Math.max(1, ...Object.values(catTotals))
+      barsEl.innerHTML = ''
+      Object.keys(catTotals).forEach(cat => {
+        const val = catTotals[cat] || 0
+        const pct = Math.round((val / max) * 100)
+        const row = document.createElement('div'); row.className = 'bar-row'
+        row.innerHTML = `<div class="bar-label">${escapeHtml(cat)}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
       <div style="width:84px;text-align:right;font-weight:700">${fmt(val)}</div>`
-    barsEl.appendChild(row)
-  })
+        barsEl.appendChild(row)
+      })
 
-  // totals this month
-  const monthTx = tx.filter(t=> todayMonthKey(new Date(t.date)) === monthKey)
-  const income = monthTx.filter(t=>t.type==='credit').reduce((s,x)=>s + Number(x.amount),0)
-  const expense = monthTx.filter(t=>t.type==='debit').reduce((s,x)=>s + Number(x.amount),0)
-  totalIncomeEl.textContent = fmt(income)
-  totalExpenseEl.textContent = fmt(expense)
-  monthSummary.textContent = `Income ${fmt(income)} • Expense ${fmt(expense)}`
+      // totals this month
+      const monthTx = tx.filter(t => todayMonthKey(new Date(t.date)) === monthKey)
+      const income = monthTx.filter(t => t.type === 'credit').reduce((s, x) => s + Number(x.amount), 0)
+      const expense = monthTx.filter(t => t.type === 'debit').reduce((s, x) => s + Number(x.amount), 0)
+      totalIncomeEl.textContent = fmt(income)
+      totalExpenseEl.textContent = fmt(expense)
+      monthSummary.textContent = `Income ${fmt(income)} • Expense ${fmt(expense)}`
 
-  // overall balance
-  const allCredit = tx.filter(t=>t.type==='credit').reduce((s,x)=>s + Number(x.amount),0)
-  const allDebit  = tx.filter(t=>t.type==='debit').reduce((s,x)=>s + Number(x.amount),0)
-  totalBalanceEl.textContent = fmt(allCredit - allDebit)
+      // overall balance
+      const allCredit = tx.filter(t => t.type === 'credit').reduce((s, x) => s + Number(x.amount), 0)
+      const allDebit = tx.filter(t => t.type === 'debit').reduce((s, x) => s + Number(x.amount), 0)
+      totalBalanceEl.textContent = fmt(allCredit - allDebit)
 
-  // Forecast (simple trend)
-  const forecast = computeForecast()
-  forecastEl.textContent = fmt(forecast)
+      // Forecast (simple trend)
+      const forecast = computeForecast()
+      forecastEl.textContent = fmt(forecast)
 
-  // Insights
-  generateInsights()
-}
+      // Insights
+      generateInsights()
+    }
 
-/* Simple forecast:
-   - Take last 3 months expense sums, compute weighted average with trend.
-*/
-function computeForecast(){
-  // sum expenses per month (last 6 months)
-  const map = {}
-  for(let i=0;i<6;i++){
-    const d = new Date()
-    d.setMonth(d.getMonth() - i)
-    map[todayMonthKey(d)] = 0
-  }
-  tx.forEach(t=>{
-    if(t.type!=='debit') return
-    const k = todayMonthKey(new Date(t.date))
-    if(k in map) map[k] += Number(t.amount)
-  })
-  const months = Object.keys(map).slice(0,3).reverse() // oldest to newest among last 3
-  const vals = months.map(m => map[m] || 0)
-  if(vals.length===0) return 0
-  // linear trend slope
-  const x = vals.map((v,i)=>i+1)
-  const y = vals
-  const n = x.length
-  const xMean = x.reduce((a,b)=>a+b,0)/n
-  const yMean = y.reduce((a,b)=>a+b,0)/n
-  let num=0, den=0
-  for(let i=0;i<n;i++){ num += (x[i]-xMean)*(y[i]-yMean); den += (x[i]-xMean)*(x[i]-xMean) }
-  const slope = den===0?0:(num/den)
-  const intercept = yMean - slope*xMean
-  const nextX = n+1
-  let pred = intercept + slope*nextX
-  // fallback to avg if weird
-  if(!isFinite(pred) || pred < 0) pred = vals.reduce((a,b)=>a+b,0)/n
-  return Math.round(pred)
-}
-
-/* Insights generator (local "AI") */
-function generateInsights(){
-  // quick stats
-  const now = new Date()
-  const thisKey = todayMonthKey(now)
-  const prev = new Date(now); prev.setMonth(prev.getMonth()-1); const prevKey = todayMonthKey(prev)
-
-  const monthSum = x => x.filter(t=> todayMonthKey(new Date(t.date)) === thisKey && t.type==='debit').reduce((s,x)=>s+Number(x.amount),0)
-  const prevSum = x => x.filter(t=> todayMonthKey(new Date(t.date)) === prevKey && t.type==='debit').reduce((s,x)=>s+Number(x.amount),0)
-
-  const thisExpense = monthSum(tx)
-  const lastExpense = prevSum(tx)
-  const diff = thisExpense - lastExpense
-  const diffPct = lastExpense === 0 ? (thisExpense>0?100:0) : Math.round((diff/lastExpense)*100)
-
-  // top categories this month
-  const catTotals = {}
-  tx.filter(t=> todayMonthKey(new Date(t.date)) === thisKey && t.type==='debit').forEach(t=>{
-    catTotals[t.category] = (catTotals[t.category]||0) + Number(t.amount)
-  })
-  const topCategory = Object.keys(catTotals).sort((a,b)=> (catTotals[b]||0) - (catTotals[a]||0))[0] || null
-  const topVal = topCategory ? catTotals[topCategory] : 0
-
-  // build summary sentence
-  let summary = ''
-  if(tx.length===0){ summary = 'Add transactions to see personalized AI-like insights and suggestions.' }
-  else {
-    summary = `This month expense ${fmt(thisExpense)}`
-    if(lastExpense>0) summary += ` (${diff >= 0 ? '+' : ''}${fmt(diff)} vs last month, ${diffPct}% )`
-    if(topCategory) summary += `. Top spend: ${escapeHtml(topCategory)} (${fmt(topVal)})`
-  }
-  insightSummary.textContent = summary
-
-  // tips generation (3)
-  const tips = []
-  if(tx.length===0){
-    tips.push('Start by adding daily expenses — the app will auto-suggest categories and trends.')
-    tips.push('Add at least one account (Wallet/Bank) to track balances.')
-    tips.push('Open the Quick Add button to rapidly log expenses while on the go.')
-  } else {
-    // Tip 1: Cut top category if it's large share
-    if(topCategory && topVal > 0){
-      const share = (topVal / Math.max(1,thisExpense)) * 100
-      if(share > 40){
-        tips.push(`You spent ${Math.round(share)}% on ${topCategory}. Try a weekly grocery list & set ₹${Math.round(topVal*0.8)} as target next month.`)
-      } else {
-        tips.push(`Top spend ${topCategory} is ₹${Math.round(topVal)}. Consider 1 small reduction this week to save ~₹${Math.round(topVal*0.05)}.`)
+    /* Simple forecast:
+       - Take last 3 months expense sums, compute weighted average with trend.
+    */
+    function computeForecast() {
+      // sum expenses per month (last 6 months)
+      const map = {}
+      for (let i = 0; i < 6; i++) {
+        const d = new Date()
+        d.setMonth(d.getMonth() - i)
+        map[todayMonthKey(d)] = 0
       }
-    } else {
-      tips.push('No dominant expense category this month — maintain steady spending.')
+      tx.forEach(t => {
+        if (t.type !== 'debit') return
+        const k = todayMonthKey(new Date(t.date))
+        if (k in map) map[k] += Number(t.amount)
+      })
+      const months = Object.keys(map).slice(0, 3).reverse() // oldest to newest among last 3
+      const vals = months.map(m => map[m] || 0)
+      if (vals.length === 0) return 0
+      // linear trend slope
+      const x = vals.map((v, i) => i + 1)
+      const y = vals
+      const n = x.length
+      const xMean = x.reduce((a, b) => a + b, 0) / n
+      const yMean = y.reduce((a, b) => a + b, 0) / n
+      let num = 0, den = 0
+      for (let i = 0; i < n; i++) { num += (x[i] - xMean) * (y[i] - yMean); den += (x[i] - xMean) * (x[i] - xMean) }
+      const slope = den === 0 ? 0 : (num / den)
+      const intercept = yMean - slope * xMean
+      const nextX = n + 1
+      let pred = intercept + slope * nextX
+      // fallback to avg if weird
+      if (!isFinite(pred) || pred < 0) pred = vals.reduce((a, b) => a + b, 0) / n
+      return Math.round(pred)
     }
 
-    // Tip 2: Trend-based
-    if(diffPct >= 20){
-      tips.push(`Expenses rose ${diffPct}% vs last month. Review recent large purchases and postpone non-essential ones.`)
-    } else if(diffPct <= -15){
-      tips.push('Good job — expenses decreased vs last month. Keep a recurring-savings target.')
-    } else {
-      tips.push('Spending is stable. Try setting a small automatic saving (e.g., 5% of income).')
+    /* Insights generator (local "AI") */
+    function generateInsights() {
+      // quick stats
+      const now = new Date()
+      const thisKey = todayMonthKey(now)
+      const prev = new Date(now); prev.setMonth(prev.getMonth() - 1); const prevKey = todayMonthKey(prev)
+
+      const monthSum = x => x.filter(t => todayMonthKey(new Date(t.date)) === thisKey && t.type === 'debit').reduce((s, x) => s + Number(x.amount), 0)
+      const prevSum = x => x.filter(t => todayMonthKey(new Date(t.date)) === prevKey && t.type === 'debit').reduce((s, x) => s + Number(x.amount), 0)
+
+      const thisExpense = monthSum(tx)
+      const lastExpense = prevSum(tx)
+      const diff = thisExpense - lastExpense
+      const diffPct = lastExpense === 0 ? (thisExpense > 0 ? 100 : 0) : Math.round((diff / lastExpense) * 100)
+
+      // top categories this month
+      const catTotals = {}
+      tx.filter(t => todayMonthKey(new Date(t.date)) === thisKey && t.type === 'debit').forEach(t => {
+        catTotals[t.category] = (catTotals[t.category] || 0) + Number(t.amount)
+      })
+      const topCategory = Object.keys(catTotals).sort((a, b) => (catTotals[b] || 0) - (catTotals[a] || 0))[0] || null
+      const topVal = topCategory ? catTotals[topCategory] : 0
+
+      // build summary sentence
+      let summary = ''
+      if (tx.length === 0) { summary = 'Add transactions to see personalized AI-like insights and suggestions.' }
+      else {
+        summary = `This month expense ${fmt(thisExpense)}`
+        if (lastExpense > 0) summary += ` (${diff >= 0 ? '+' : ''}${fmt(diff)} vs last month, ${diffPct}% )`
+        if (topCategory) summary += `. Top spend: ${escapeHtml(topCategory)} (${fmt(topVal)})`
+      }
+      insightSummary.textContent = summary
+
+      // tips generation (3)
+      const tips = []
+      if (tx.length === 0) {
+        tips.push('Start by adding daily expenses — the app will auto-suggest categories and trends.')
+        tips.push('Add at least one account (Wallet/Bank) to track balances.')
+        tips.push('Open the Quick Add button to rapidly log expenses while on the go.')
+      } else {
+        // Tip 1: Cut top category if it's large share
+        if (topCategory && topVal > 0) {
+          const share = (topVal / Math.max(1, thisExpense)) * 100
+          if (share > 40) {
+            tips.push(`You spent ${Math.round(share)}% on ${topCategory}. Try a weekly grocery list & set ₹${Math.round(topVal * 0.8)} as target next month.`)
+          } else {
+            tips.push(`Top spend ${topCategory} is ₹${Math.round(topVal)}. Consider 1 small reduction this week to save ~₹${Math.round(topVal * 0.05)}.`)
+          }
+        } else {
+          tips.push('No dominant expense category this month — maintain steady spending.')
+        }
+
+        // Tip 2: Trend-based
+        if (diffPct >= 20) {
+          tips.push(`Expenses rose ${diffPct}% vs last month. Review recent large purchases and postpone non-essential ones.`)
+        } else if (diffPct <= -15) {
+          tips.push('Good job — expenses decreased vs last month. Keep a recurring-savings target.')
+        } else {
+          tips.push('Spending is stable. Try setting a small automatic saving (e.g., 5% of income).')
+        }
+
+        // Tip 3: Quick action
+        tips.push('Quick action: Export this month\'s transactions as CSV and review top 5 entries for possible cuts.')
+      }
+
+      // render tips
+      insightTips.innerHTML = ''
+      tips.slice(0, 3).forEach((t, i) => {
+        const d = document.createElement('div'); d.className = 'tip'; d.textContent = `${i + 1}. ${t}`; insightTips.appendChild(d)
+      })
     }
 
-    // Tip 3: Quick action
-    tips.push('Quick action: Export this month\'s transactions as CSV and review top 5 entries for possible cuts.')
-  }
+    /* ---------- helpers ---------- */
+    function updateTotals() {
+      // update account balances by computing from tx
+      accounts.forEach(a => {
+        const bal = accountBalance(a.id)
+        a.balance = bal
+      })
+      save(KEY_ACCTS, accounts)
+      renderAccounts()
+      renderDashboard()
+    }
 
-  // render tips
-  insightTips.innerHTML = ''
-  tips.slice(0,3).forEach((t,i)=>{
-    const d = document.createElement('div'); d.className='tip'; d.textContent = `${i+1}. ${t}`; insightTips.appendChild(d)
-  })
-}
+    function renderAccountSelects() {
+      const sel1 = $('#sheetAccount'); sel1.innerHTML = '<option value="">Select account</option>'
+      accounts.forEach(a => sel1.insertAdjacentHTML('beforeend', `<option value="${a.id}">${escapeHtml(a.name)}</option>`))
+      const sel2 = $('#sheetCategory'); sel2.innerHTML = ''
+      categories.forEach(c => sel2.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`))
+    }
 
-/* ---------- helpers ---------- */
-function updateTotals(){
-  // update account balances by computing from tx
-  accounts.forEach(a=>{
-    const bal = accountBalance(a.id)
-    a.balance = bal
-  })
-  save(KEY_ACCTS, accounts)
-  renderAccounts()
-  renderDashboard()
-}
+    function populateSheetSelects() {
+      renderAccountSelects()
+      if (accounts.length > 0) $('#sheetAccount').value = accounts[0].id
+      if (categories.length > 0) $('#sheetCategory').value = categories[0]
+    }
 
-function renderAccountSelects(){
-  const sel1 = $('#sheetAccount'); sel1.innerHTML = '<option value="">Select account</option>'
-  accounts.forEach(a=> sel1.insertAdjacentHTML('beforeend', `<option value="${a.id}">${escapeHtml(a.name)}</option>`))
-  const sel2 = $('#sheetCategory'); sel2.innerHTML = ''
-  categories.forEach(c=> sel2.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`))
-}
-
-function populateSheetSelects(){
-  renderAccountSelects()
-  if(accounts.length>0) $('#sheetAccount').value = accounts[0].id
-  if(categories.length>0) $('#sheetCategory').value = categories[0]
-}
-
-/* ---------- export/import/clear ---------- */
-$('#exportBtn')?.addEventListener('click', ()=> {
-  const blob = new Blob([JSON.stringify({accounts,tx,categories},null,2)],{type:'application/json'})
-  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'smartbudget_export.json'; a.click(); URL.revokeObjectURL(url)
-})
-$('#exportCSV')?.addEventListener('click', ()=>{
-  if(tx.length===0) return alert('No transactions to export')
-  const rows = [['id','account','type','amount','category','remark','date']]
-  tx.forEach(t=>{ const a = accounts.find(x=>x.id===t.acctId); rows.push([t.id, a? a.name : '', t.type, t.amount, t.category, (t.remark||''), t.date]) })
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n')
-  const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='transactions.csv'; a.click(); URL.revokeObjectURL(url)
-})
-$('#importBtn')?.addEventListener('click', ()=> $('#fileInput').click())
-$('#fileInput')?.addEventListener('change', (e)=> {
-  const f = e.target.files[0]; if(!f) return
-  const r = new FileReader(); r.onload = ev => {
-    try{
-      const data = JSON.parse(ev.target.result)
-      if(!data.accounts || !data.tx || !data.categories) return alert('Invalid file format')
-      if(!confirm('Import will replace local data. Continue?')) return
-      accounts = data.accounts; tx = data.tx; categories = data.categories
+    /* ---------- export/import/clear ---------- */
+    $('#exportBtn')?.addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify({ accounts, tx, categories }, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'smartbudget_export.json'; a.click(); URL.revokeObjectURL(url)
+    })
+    $('#exportCSV')?.addEventListener('click', () => {
+      if (tx.length === 0) return alert('No transactions to export')
+      const rows = [['id', 'account', 'type', 'amount', 'category', 'remark', 'date']]
+      tx.forEach(t => { const a = accounts.find(x => x.id === t.acctId); rows.push([t.id, a ? a.name : '', t.type, t.amount, t.category, (t.remark || ''), t.date]) })
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+      const blob = new Blob([csv], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'transactions.csv'; a.click(); URL.revokeObjectURL(url)
+    })
+    $('#importBtn')?.addEventListener('click', () => $('#fileInput').click())
+    $('#fileInput')?.addEventListener('change', (e) => {
+      const f = e.target.files[0]; if (!f) return
+      const r = new FileReader(); r.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result)
+          if (!data.accounts || !data.tx || !data.categories) return alert('Invalid file format')
+          if (!confirm('Import will replace local data. Continue?')) return
+          accounts = data.accounts; tx = data.tx; categories = data.categories
+          save(KEY_ACCTS, accounts); save(KEY_TX, tx); save(KEY_CATS, categories)
+          renderAccounts(); renderTxList(); renderCategories(); renderAccountSelects(); renderDashboard()
+          alert('Imported OK')
+        } catch (err) { alert('Invalid JSON') }
+      }; r.readAsText(f)
+    })
+    $('#clearAll')?.addEventListener('click', () => {
+      if (!confirm('Clear ALL data (accounts, transactions, categories)?')) return
+      accounts = []; tx = []; categories = ['Food', 'Travel', 'Shopping', 'Bills', 'Others']
       save(KEY_ACCTS, accounts); save(KEY_TX, tx); save(KEY_CATS, categories)
       renderAccounts(); renderTxList(); renderCategories(); renderAccountSelects(); renderDashboard()
-      alert('Imported OK')
-    } catch(err){ alert('Invalid JSON') }
-  }; r.readAsText(f)
-})
-$('#clearAll')?.addEventListener('click', ()=> {
-  if(!confirm('Clear ALL data (accounts, transactions, categories)?')) return
-  accounts = []; tx = []; categories = ['Food','Travel','Shopping','Bills','Others']
-  save(KEY_ACCTS, accounts); save(KEY_TX, tx); save(KEY_CATS, categories)
-  renderAccounts(); renderTxList(); renderCategories(); renderAccountSelects(); renderDashboard()
-})
+    })
 
-/* Sheets control */
-function openSheet(id){ $(`#${id}`).classList.add('open'); $(`#${id}`).setAttribute('aria-hidden','false') }
-function closeSheet(id){ $(`#${id}`).classList.remove('open'); $(`#${id}`).setAttribute('aria-hidden','true') }
+    /* Sheets control */
+    function openSheet(id) { $(`#${id}`).classList.add('open'); $(`#${id}`).setAttribute('aria-hidden', 'false') }
+    function closeSheet(id) { $(`#${id}`).classList.remove('open'); $(`#${id}`).setAttribute('aria-hidden', 'true') }
 
-/* Account sheet buttons */
-$('#openAccountSheet')?.addEventListener('click', ()=> openSheet('sheetAccount'))
-$('#closeAcct')?.addEventListener('click', ()=> closeSheet('sheetAccount'))
-$('#saveAccount')?.addEventListener('click', ()=> {
-  const name = $('#acctNewName').value.trim(); const bal = parseFloat($('#acctInitBal').value) || 0
-  if(!name) return alert('Enter name')
-  accounts.push({id: uid(), name, balance: bal})
-  save(KEY_ACCTS, accounts); $('#acctNewName').value=''; $('#acctInitBal').value=''
-  closeSheet('sheetAccount'); renderAccounts(); renderAccountSelects(); updateTotals()
-})
+    /* Account sheet buttons */
+    $('#openAccountSheet')?.addEventListener('click', () => openSheet('sheetAccount'))
+    $('#closeAcct')?.addEventListener('click', () => closeSheet('sheetAccount'))
+    $('#saveAccount')?.addEventListener('click', () => {
+      const name = $('#acctNewName').value.trim(); const bal = parseFloat($('#acctInitBal').value) || 0
+      if (!name) return alert('Enter name')
+      accounts.push({ id: uid(), name, balance: bal })
+      save(KEY_ACCTS, accounts); $('#acctNewName').value = ''; $('#acctInitBal').value = ''
+      closeSheet('sheetAccount'); renderAccounts(); renderAccountSelects(); updateTotals()
+    })
 
-/* small utilities */
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])) }
+    /* small utilities */
+    function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[c])) }
 
-/* service worker registration (if you have service-worker.js) */
-if('serviceWorker' in navigator){
-  try { navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW registered')).catch(()=>{}) } catch(e) {}
-}
+    /* service worker registration (if you have service-worker.js) */
+    if ('serviceWorker' in navigator) {
+      try { navigator.serviceWorker.register('service-worker.js').then(() => console.log('SW registered')).catch(() => { }) } catch (e) { }
+    }
 
-/* initial demo seed (optional)
-if(accounts.length===0){
-  const a1 = {id:uid(), name:'Wallet', balance:0}; const a2 = {id:uid(), name:'Bank', balance:0}
-  accounts.push(a1,a2); save(KEY_ACCTS,accounts)
-  tx.push({id:uid(), acctId:a1.id, type:'debit', amount:250, category:'Food', remark:'Grocery', date:new Date().toISOString()})
-  tx.push({id:uid(), acctId:a2.id, type:'credit', amount:2000, category:'Salary', remark:'Salary', date:new Date().toISOString()})
-  save(KEY_TX,tx); renderAccounts(); renderTxList(); renderDashboard(); renderAccountSelects()
-}
-*/
+    /* initial demo seed (optional)
+    if(accounts.length===0){
+      const a1 = {id:uid(), name:'Wallet', balance:0}; const a2 = {id:uid(), name:'Bank', balance:0}
+      accounts.push(a1,a2); save(KEY_ACCTS,accounts)
+      tx.push({id:uid(), acctId:a1.id, type:'debit', amount:250, category:'Food', remark:'Grocery', date:new Date().toISOString()})
+      tx.push({id:uid(), acctId:a2.id, type:'credit', amount:2000, category:'Salary', remark:'Salary', date:new Date().toISOString()})
+      save(KEY_TX,tx); renderAccounts(); renderTxList(); renderDashboard(); renderAccountSelects()
+    }
+    */
 
-</script>
+  </script>
 </body>
+
 </html>
