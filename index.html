@@ -5,52 +5,334 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Finance Tracker</title>
   
-<!-- PWA Manifest & Theme -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#06b6d4">
+  <!-- PWA Manifest & Theme -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#06b6d4">
 
   <style>
-    :root{
-      --bg:#071427; --card:#0f2130; --accent:#06b6d4; --muted:#9fb0c3; --danger:#ff6b6b;
-      --income-bg:#083344; --expense-bg:#44120e;
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #06b6d4;
+      --accent-hover: #0ea5e9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --income-bg: rgba(6, 182, 212, 0.15);
+      --expense-bg: rgba(239, 68, 68, 0.15);
+      --text: #f1f5f9;
+      --border: rgba(255, 255, 255, 0.08);
     }
-    *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial;margin:0;padding:0;color:#E6EEF3}
-    body{background:linear-gradient(180deg,#021426 0%, #041728 100%);padding:18px}
-    .app{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
-    h1{font-size:20px}
-    .muted{color:var(--muted);font-size:13px}
-
-    .grid{display:grid;grid-template-columns:320px 1fr 360px;gap:14px}
-    .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-    .small{font-size:12px;color:var(--muted)}
-    input, select, textarea, button{font-family:inherit}
-    input[type="text"], input[type="number"], input[type="date"], select, textarea{
-      width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
-      background:rgba(255,255,255,0.02); color: #E6EEF3;
+    
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--text);
     }
-    button{background:var(--accent);border:none;padding:8px 10px;border-radius:8px;color:#012;cursor:pointer;font-weight:700}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .btn-danger{background:var(--danger);color:#fff;border:none}
-
-    .cust-list{max-height:420px;overflow:auto;margin-top:10px}
-    .cust-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:8px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent)}
-    .cust-item .left{display:flex;flex-direction:column}
-    .badge{font-weight:700;padding:6px 8px;border-radius:8px}
-    .balance-pos{background:var(--income-bg);color:#9ff0e7}
-    .balance-neg{background:var(--expense-bg);color:#ffd4d4}
-
-    .ledger{max-height:420px;overflow:auto;margin-top:10px}
-    .txn{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:8px;background:linear-gradient(90deg,rgba(255,255,255,0.01),transparent)}
-    .txn .left{display:flex;flex-direction:column}
-    .txn .meta{font-size:12px;color:var(--muted)}
-
-    .summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .stat{flex:1;min-width:120px;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
-    .stat .num{font-weight:800;font-size:16px}
-
-    footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
-    @media (max-width:1000px){ .grid{grid-template-columns:1fr; } .card{padding:10px} .summary{flex-direction:column} }
+    
+    body {
+      background: var(--bg);
+      padding: 16px;
+      line-height: 1.5;
+    }
+    
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: 320px 1fr 360px;
+      }
+    }
+    
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+    }
+    
+    .small {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    input, select, textarea, button {
+      font-family: inherit;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    input[type="text"], input[type="number"], input[type="date"], input[type="search"], select, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+    
+    button {
+      background: var(--accent);
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #0f172a;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      border: none;
+    }
+    
+    .btn-danger:hover {
+      background: var(--danger-hover);
+      transform: translateY(-1px);
+    }
+    
+    .cust-list {
+      max-height: 420px;
+      overflow: auto;
+      margin-top: 16px;
+    }
+    
+    .cust-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .cust-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-1px);
+    }
+    
+    .cust-item .left {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .badge {
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      min-width: 100px;
+      text-align: center;
+    }
+    
+    .balance-pos {
+      background: var(--income-bg);
+      color: #06b6d4;
+    }
+    
+    .balance-neg {
+      background: var(--expense-bg);
+      color: #ef4444;
+    }
+    
+    .ledger {
+      max-height: 420px;
+      overflow: auto;
+      margin-top: 16px;
+    }
+    
+    .txn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .txn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-1px);
+    }
+    
+    .txn .left {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .txn .meta {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
+    .summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    
+    .stat {
+      flex: 1;
+      min-width: 120px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+    }
+    
+    .stat .num {
+      font-weight: 800;
+      font-size: 20px;
+      margin-top: 8px;
+    }
+    
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 16px;
+    }
+    
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .form-row > * {
+      flex: 1;
+      min-width: 120px;
+    }
+    
+    .mobile-full {
+      width: 100%;
+    }
+    
+    @media (max-width: 767px) {
+      .action-buttons {
+        width: 100%;
+        margin-top: 12px;
+      }
+      
+      .action-buttons button {
+        flex: 1;
+      }
+      
+      .form-row {
+        flex-direction: column;
+      }
+      
+      .form-row > * {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -58,58 +340,57 @@
     <header>
       <div>
         <h1>Smart Budget App</h1>
-        <div class="muted">Create customers, add credit/debit transactions, view per-customer balance</div>
+        <div class="muted">Track income and expenses with customer management</div>
       </div>
-      <div class="muted">Offline: data saved in your browser (localStorage)</div>
+      <div class="muted">Data saved locally in your browser</div>
     </header>
 
     <div class="grid">
       <!-- LEFT: Customers -->
       <div class="card">
-        <div style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+        <div class="card-header">
           <div>
             <div class="small">Customers</div>
             <strong id="custCount">0</strong>
           </div>
-          <div style="display:flex;gap:8px">
+          <div class="action-buttons">
             <button id="exportBtn">Export</button>
             <button id="importBtn" class="btn-ghost">Import</button>
             <input type="file" id="fileInput" accept="application/json" style="display:none" />
           </div>
         </div>
 
-        <div style="margin-top:10px;display:flex;gap:8px">
-          <input id="newCustomer" type="text" placeholder="Enter customer name" autocomplete="off" maxlength="50" aria-label="New customer name" title="Type name and press Enter or click Add" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('addCustomer').click();}" />
+        <div class="form-row">
+          <input id="newCustomer" type="text" placeholder="Customer name" autocomplete="off" maxlength="50" aria-label="New customer name" title="Type name and press Enter or click Add" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('addCustomer').click();}" />
           <button id="addCustomer">Add</button>
         </div>
 
         <div class="cust-list" id="customers"></div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:10px 0" />
+        <hr />
 
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="display:flex;align-items:center;gap:8px;min-width:0">
-            <input id="searchCustomer" type="search" placeholder="Search customers (name) — Enter to search, Esc to clear"
-                   autocomplete="off" maxlength="50" aria-label="Search customers" title="Type name and press Enter to search"
-                   onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('applySearch').click();} else if(event.key==='Escape'){document.getElementById('clearSearch').click();}"
-                   style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit;min-width:160px;flex:1" />
+        <div class="form-row">
+          <input id="searchCustomer" type="search" placeholder="Search customers" 
+                 autocomplete="off" maxlength="50" aria-label="Search customers" title="Type name and press Enter to search"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('applySearch').click();} else if(event.key==='Escape'){document.getElementById('clearSearch').click();}" />
+          <div class="action-buttons mobile-full">
+            <button id="applySearch" class="btn-ghost">Search</button>
+            <button id="clearSearch" class="btn-ghost">Clear</button>
           </div>
-          <button id="applySearch" class="btn-ghost">Search</button>
-          <button id="clearSearch" class="btn-ghost">Clear</button>
         </div>
       </div>
 
       <!-- MIDDLE: Ledger / Txn -->
       <div class="card">
- </svg>       <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="card-header">
           <div>
             <div class="small">Active Customer</div>
             <strong id="activeName">— select a customer —</strong>
           </div>
-          <div class="small">Customer Balance: <span id="activeBalance">₹0.00</span></div>
+          <div class="small">Balance: <span id="activeBalance">₹0.00</span></div>
         </div>
 
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <div class="form-row">
           <select id="txType">
             <option value="credit">Credit (Received)</option>
             <option value="debit">Debit (Paid)</option>
@@ -118,9 +399,9 @@
           <input type="date" id="txDate" />
         </div>
 
-        <div style="margin-top:8px">
+        <div style="margin-bottom: 12px;">
           <input type="text" id="txRemark"
-            placeholder="Remark (e.g. Salary, Invoice #, from whom) — optional"
+            placeholder="Remark (optional)"
             maxlength="100" autocomplete="off" aria-label="Transaction remark"
             title="Who/from where — optional. Press Enter to add transaction"
             onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('addTx').click();}"
@@ -135,47 +416,49 @@
           </datalist>
         </div>
 
-        <div style="margin-top:8px;display:flex;gap:8px">
+        <div class="form-row">
           <button id="addTx">Add Transaction</button>
           <button id="resetTx" class="btn-ghost">Reset</button>
           <button id="deleteAllCustTx" class="btn-danger" title="Delete all transactions of active customer">Delete All Tx</button>
         </div>
 
-        <div style="margin-top:12px" class="summary" id="custSummary">
+        <div class="summary" id="custSummary">
           <div class="stat"><div class="small">Total Credit</div><div class="num" id="custCredit">₹0.00</div></div>
           <div class="stat"><div class="small">Total Debit</div><div class="num" id="custDebit">₹0.00</div></div>
           <div class="stat"><div class="small">Balance</div><div class="num" id="custBal">₹0.00</div></div>
         </div>
 
-        <div style="margin-top:12px" class="small">Ledger (recent first)</div>
+        <div style="margin-top: 16px" class="small">Ledger (recent first)</div>
         <div class="ledger" id="ledger"></div>
       </div>
 
       <!-- RIGHT: Global summary -->
       <div class="card">
-        <div>
-          <div class="small">Global Summary</div>
-          <div style="margin-top:6px"><strong id="globalCount">0</strong> customers</div>
+        <div class="card-header">
+          <div>
+            <div class="small">Global Summary</div>
+            <strong id="globalCount">0</strong> customers
+          </div>
         </div>
 
-        <div style="margin-top:10px">
+        <div style="margin-top: 16px">
           <div class="small">Overall income / expense</div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <div style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)">
+          <div class="summary">
+            <div class="stat">
               <div class="small">Income</div>
               <div class="num" id="globalIncome">₹0.00</div>
             </div>
-            <div style="flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)">
+            <div class="stat">
               <div class="small">Expense</div>
               <div class="num" id="globalExpense">₹0.00</div>
             </div>
           </div>
         </div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:10px 0" />
+        <hr />
 
         <div class="small">Quick actions</div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
           <button id="exportAll" class="btn-ghost">Export All Data</button>
           <button id="clearAll" class="btn-danger">Clear All Data</button>
         </div>
