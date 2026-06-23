@@ -1,210 +1,38 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Customer</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b0713;
-  color:white;
-}
-
-/* TOP */
-.header{
-  padding:15px;
-  background:#1a0f2e;
-  font-size:18px;
-  font-weight:700;
-}
-
-/* SUMMARY BOX */
-.summary{
-  display:flex;
-  gap:10px;
-  padding:15px;
-}
-
-.box{
-  flex:1;
-  padding:15px;
-  border-radius:12px;
-  text-align:center;
-}
-
-.givenBox{background:#2d0f0f; color:#ff4d4d;}
-.recBox{background:#0f2d1f; color:#00ff9d;}
-
-/* TRANSACTIONS */
-.list{
-  padding:10px;
-  padding-bottom:80px;
-}
-
-.msg{
-  max-width:70%;
-  padding:10px;
-  margin:8px;
-  border-radius:12px;
-  font-size:14px;
-}
-
-.right{
-  margin-left:auto;
-  background:#0f2d1f;
-  text-align:right;
-}
-
-.left{
-  margin-right:auto;
-  background:#2d0f0f;
-}
-
-/* BOTTOM BUTTONS */
-.bottom{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  display:flex;
-}
-
-.bottom button{
-  flex:1;
-  padding:15px;
-  border:none;
-  font-weight:bold;
-  color:white;
-}
-
-.recBtn{background:#00c853;}
-.givBtn{background:#d50000;}
-
-</style>
-</head>
-
-<body>
-
-<div class="header" id="name">Customer</div>
-
-<!-- SUMMARY -->
-<div class="summary">
-  <div class="box recBox">
-    Total Received<br>
-    <h2 id="recTotal">0</h2>
-  </div>
-
-  <div class="box givenBox">
-    Total Given<br>
-    <h2 id="givTotal">0</h2>
-  </div>
-
-</div>
-
-<!-- TRANSACTIONS -->
-<div class="list" id="list"></div>
-
-<!-- BOTTOM -->
-<div class="bottom">
-  <button class="recBtn" onclick="openPopup('credit')">+ Received</button>
-  <button class="givBtn" onclick="openPopup('debit')">+ Given</button>
-</div>
-  <!-- POPUP -->
-<div id="popup" style="display:none;position:fixed;left:0;right:0;bottom:0;background:#1a0f2e;padding:15px;border-top-left-radius:15px;border-top-right-radius:15px;">
-  
-  <h3 id="popupTitle">Add</h3>
-
-  <input id="amount" placeholder="Amount" style="width:100%;padding:10px;margin-top:10px">
-  <input id="note" placeholder="Note" style="width:100%;padding:10px;margin-top:10px">
-
-  <button onclick="saveTx()" style="width:100%;padding:12px;margin-top:10px;background:#00c853;border:none;color:white;font-weight:bold">
-    Save
-  </button>
-
-  <button onclick="closePopup()" style="width:100%;padding:10px;margin-top:5px;background:#333;border:none;color:white">
-    Close
-  </button>
-
-</div>
-
-<script>
-
-const id = new URLSearchParams(location.search).get("id")
-
-const accounts = JSON.parse(localStorage.getItem("SB_ACCOUNTS_v1") || "[]")
-const tx = JSON.parse(localStorage.getItem("SB_TX_v1") || "[]")
-
-const acc = accounts.find(a => a.id === id)
-
-document.getElementById("name").innerText = acc ? acc.name : "Customer"
-
-const list = tx.filter(t => t.acctId === id)
-
 let rec = 0, giv = 0
 let html = ""
+
+// 🔥 SORT BY DATE (LATEST FIRST)
+const list = tx
+  .filter(t => t.acctId === id)
+  .sort((a,b) => new Date(b.date) - new Date(a.date))
+
+let runningBalance = 0
 
 list.forEach(t => {
 
   if(t.type === "credit") rec += Number(t.amount)
   else giv += Number(t.amount)
 
+  if(t.type === "credit") runningBalance += Number(t.amount)
+  else runningBalance -= Number(t.amount)
+
   html += `
     <div class="msg ${t.type === "credit" ? "right" : "left"}">
-      ₹${t.amount}<br>
-      ${t.remark || ""}
+
+      <div class="amountBox" style="background:${t.type==='credit' ? '#00c853' : '#d50000'};color:white;">
+        ₹${t.amount}
+      </div>
+
+      <div>${t.remark || "No note"}</div>
+
+      <div style="font-size:11px;opacity:0.7;margin-top:5px">
+        ${new Date(t.date).toLocaleString()}
+      </div>
+
+      <div class="balanceText">
+        After this: ₹${runningBalance}
+      </div>
+
     </div>
   `
 })
-
-document.getElementById("recTotal").innerText = rec
-document.getElementById("givTotal").innerText = giv
-document.getElementById("list").innerHTML = html || "<p style='padding:10px'>No transactions</p>"
-
-  let currentType = ""
-
-function openPopup(type){
-  currentType = type
-  document.getElementById("popup").style.display = "block"
-  document.getElementById("popupTitle").innerText = type === "credit" ? "Add Received" : "Add Given"
-}
-
-function closePopup(){
-  document.getElementById("popup").style.display = "none"
-  document.getElementById("amount").value = ""
-  document.getElementById("note").value = ""
-}
-
-function saveTx(){
-
-  const amount = document.getElementById("amount").value
-  const note = document.getElementById("note").value
-
-  if(!amount){
-    alert("Enter amount")
-    return
-  }
-
-  let tx = JSON.parse(localStorage.getItem("SB_TX_v1") || "[]")
-
-  tx.push({
-    id: Date.now(),
-    acctId: id,
-    type: currentType,
-    amount: Number(amount),
-    remark: note,
-    date: new Date().toISOString()
-  })
-
-  localStorage.setItem("SB_TX_v1", JSON.stringify(tx))
-
-  closePopup()
-  location.reload()   // refresh to update UI
-}
-
-</script>
-
-</body>
-</html>
