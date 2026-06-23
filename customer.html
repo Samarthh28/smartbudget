@@ -1,97 +1,119 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Customer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customer</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      background:#0b0713;
-      color:white;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0713;
+  color:white;
+}
 
-    .header{
-      padding:15px;
-      background:#1a0f2e;
-      font-size:18px;
-      font-weight:700;
-    }
-    .balance-box{
-  display:flex;
-  justify-content:space-between;
+/* TOP */
+.header{
   padding:15px;
-  gap:12px;
+  background:#1a0f2e;
+  font-size:18px;
+  font-weight:700;
+}
+
+/* SUMMARY BOX */
+.summary{
+  display:flex;
+  gap:10px;
+  padding:15px;
 }
 
 .box{
   flex:1;
-  padding:18px;
+  padding:15px;
   border-radius:12px;
   text-align:center;
 }
 
-    .received{background:#0f2d1f; color:#00ff9d;}
-    .given{background:#2d0f0f; color:#ff4d4d;}
+.givenBox{background:#2d0f0f; color:#ff4d4d;}
+.recBox{background:#0f2d1f; color:#00ff9d;}
 
-    .tx{
-      padding:12px;
-      border-bottom:1px solid #222;
-    }
-
-    .btns{
-      position:fixed;
-      bottom:0;
-      left:0;
-      right:0;
-      display:flex;
-    }
-
-    .btns button{
-      flex:1;
-      padding:15px;
-      border:none;
-      font-weight:bold;
-      color:white;
-    }
-
-    .recBtn{background:#00c853;}
-    .givBtn{background:#d50000;}
-    @media(max-width:600px){
-  .balance-box{
-    flex-direction:row;
-  }
+/* TRANSACTIONS */
+.list{
+  padding:10px;
+  padding-bottom:80px;
 }
-  </style>
+
+.msg{
+  max-width:70%;
+  padding:10px;
+  margin:8px;
+  border-radius:12px;
+  font-size:14px;
+}
+
+.right{
+  margin-left:auto;
+  background:#0f2d1f;
+  text-align:right;
+}
+
+.left{
+  margin-right:auto;
+  background:#2d0f0f;
+}
+
+/* BOTTOM BUTTONS */
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  display:flex;
+}
+
+.bottom button{
+  flex:1;
+  padding:15px;
+  border:none;
+  font-weight:bold;
+  color:white;
+}
+
+.recBtn{background:#00c853;}
+.givBtn{background:#d50000;}
+
+</style>
 </head>
 
 <body>
 
 <div class="header" id="name">Customer</div>
 
-<div class="balance-box">
-  <div class="box received">
-    Received<br>
-    <h2 id="rec">0</h2>
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="box givenBox">
+    Total Given<br>
+    <h2 id="givTotal">0</h2>
   </div>
 
-  <div class="box given">
-    Given<br>
-    <h2 id="giv">0</h2>
+  <div class="box recBox">
+    Total Received<br>
+    <h2 id="recTotal">0</h2>
   </div>
 </div>
 
-<h3 style="padding:10px">Transactions</h3>
-<div id="list"></div>
+<!-- TRANSACTIONS -->
+<div class="list" id="list"></div>
 
-<div class="btns">
-  <button class="recBtn">Received</button>
-  <button class="givBtn">Given</button>
+<!-- BOTTOM -->
+<div class="bottom">
+  <button class="recBtn">+ Received</button>
+  <button class="givBtn">+ Given</button>
 </div>
 
 <script>
+
 const id = new URLSearchParams(location.search).get("id")
 
 const accounts = JSON.parse(localStorage.getItem("SB_ACCOUNTS_v1") || "[]")
@@ -107,21 +129,22 @@ let rec = 0, giv = 0
 let html = ""
 
 list.forEach(t => {
+
   if(t.type === "credit") rec += Number(t.amount)
   else giv += Number(t.amount)
 
   html += `
-    <div class="tx">
-      <b>${t.type === "credit" ? "Received" : "Given"}</b> - ₹${t.amount}<br>
-      ${t.category} | ${t.remark || ""}<br>
-      <small>${t.date}</small>
+    <div class="msg ${t.type === "credit" ? "right" : "left"}">
+      ₹${t.amount}<br>
+      ${t.remark || ""}
     </div>
   `
 })
 
-document.getElementById("rec").innerText = rec
-document.getElementById("giv").innerText = giv
+document.getElementById("recTotal").innerText = rec
+document.getElementById("givTotal").innerText = giv
 document.getElementById("list").innerHTML = html || "<p style='padding:10px'>No transactions</p>"
+
 </script>
 
 </body>
