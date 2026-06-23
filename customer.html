@@ -109,8 +109,25 @@ body{
 
 <!-- BOTTOM -->
 <div class="bottom">
-  <button class="recBtn">+ Received</button>
-  <button class="givBtn">+ Given</button>
+  <button class="recBtn" onclick="openPopup('credit')">+ Received</button>
+  <button class="givBtn" onclick="openPopup('debit')">+ Given</button>
+</div>
+  <!-- POPUP -->
+<div id="popup" style="display:none;position:fixed;left:0;right:0;bottom:0;background:#1a0f2e;padding:15px;border-top-left-radius:15px;border-top-right-radius:15px;">
+  
+  <h3 id="popupTitle">Add</h3>
+
+  <input id="amount" placeholder="Amount" style="width:100%;padding:10px;margin-top:10px">
+  <input id="note" placeholder="Note" style="width:100%;padding:10px;margin-top:10px">
+
+  <button onclick="saveTx()" style="width:100%;padding:12px;margin-top:10px;background:#00c853;border:none;color:white;font-weight:bold">
+    Save
+  </button>
+
+  <button onclick="closePopup()" style="width:100%;padding:10px;margin-top:5px;background:#333;border:none;color:white">
+    Close
+  </button>
+
 </div>
 
 <script>
