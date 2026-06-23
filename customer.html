@@ -163,6 +163,47 @@ document.getElementById("recTotal").innerText = rec
 document.getElementById("givTotal").innerText = giv
 document.getElementById("list").innerHTML = html || "<p style='padding:10px'>No transactions</p>"
 
+  let currentType = ""
+
+function openPopup(type){
+  currentType = type
+  document.getElementById("popup").style.display = "block"
+  document.getElementById("popupTitle").innerText = type === "credit" ? "Add Received" : "Add Given"
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display = "none"
+  document.getElementById("amount").value = ""
+  document.getElementById("note").value = ""
+}
+
+function saveTx(){
+
+  const amount = document.getElementById("amount").value
+  const note = document.getElementById("note").value
+
+  if(!amount){
+    alert("Enter amount")
+    return
+  }
+
+  let tx = JSON.parse(localStorage.getItem("SB_TX_v1") || "[]")
+
+  tx.push({
+    id: Date.now(),
+    acctId: id,
+    type: currentType,
+    amount: Number(amount),
+    remark: note,
+    date: new Date().toISOString()
+  })
+
+  localStorage.setItem("SB_TX_v1", JSON.stringify(tx))
+
+  closePopup()
+  location.reload()   // refresh to update UI
+}
+
 </script>
 
 </body>
