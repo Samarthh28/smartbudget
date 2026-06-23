@@ -19,20 +19,19 @@
       font-size:18px;
       font-weight:700;
     }
-
     .balance-box{
-      display:flex;
-      justify-content:space-between;
-      padding:15px;
-      gap:10px;
-    }
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  gap:12px;
+}
 
-    .box{
-      flex:1;
-      padding:15px;
-      border-radius:12px;
-      text-align:center;
-    }
+.box{
+  flex:1;
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+}
 
     .received{background:#0f2d1f; color:#00ff9d;}
     .given{background:#2d0f0f; color:#ff4d4d;}
@@ -60,6 +59,11 @@
 
     .recBtn{background:#00c853;}
     .givBtn{background:#d50000;}
+    @media(max-width:600px){
+  .balance-box{
+    flex-direction:row;
+  }
+}
   </style>
 </head>
 
