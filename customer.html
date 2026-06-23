@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Customer Details</title>
+  <style>
+    body { font-family: Arial; background:#0b0713; color:white; padding:20px; }
+    .card { background:#1a0f2e; padding:15px; border-radius:10px; margin-bottom:10px; }
+    .tx { padding:10px; border-bottom:1px solid #333; }
+  </style>
+</head>
+
+<body>
+
+<h2>Customer Dashboard</h2>
+<div id="name"></div>
+<h3>Transactions</h3>
+<div id="list"></div>
+
+<script>
+const params = new URLSearchParams(window.location.search)
+const id = params.get("id")
+
+const accounts = JSON.parse(localStorage.getItem("SB_ACCOUNTS_v1") || "[]")
+const tx = JSON.parse(localStorage.getItem("SB_TX_v1") || "[]")
+
+const acc = accounts.find(a => a.id === id)
+
+document.getElementById("name").innerHTML =
+  "<div class='card'><h3>" + acc.name + "</h3></div>"
+
+const list = tx.filter(t => t.acctId === id)
+
+let html = ""
+list.forEach(t => {
+  html += `
+    <div class="tx">
+      <b>${t.type}</b> - ₹${t.amount}<br>
+      ${t.category} | ${t.remark || ""}<br>
+      <small>${t.date}</small>
+    </div>
+  `
+})
+
+document.getElementById("list").innerHTML =
+  html || "<p>No transactions</p>"
+</script>
+
+</body>
+</html>
